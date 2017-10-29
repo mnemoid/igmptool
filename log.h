@@ -41,6 +41,6 @@
 
 int init_log(int, char *);
 void close_log(void);
-void write_log(int, const char *, ...);
+size_t write_log(int, const char *, ...);
 
 #endif /* LOG_H_ */

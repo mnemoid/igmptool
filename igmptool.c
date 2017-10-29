@@ -478,7 +478,7 @@ void print_usage(void) {
 	fprintf(stderr, "    -L level       : Log level from 0 to 7. Default: %d\n", DEFAULT_LOG_LEVEL);
 	fprintf(stderr, "    -p path        : Set PID file path. Default: %s\n", PID_FILE_PATH);
 	fprintf(stderr, "    -q interval    : Set general query interval in seconds. Default: %d\n", DEFAULT_QUERY_INTERVAL);
-	fprintf(stderr, "    -r interval    : Set query response interval in milliseconds. Default: %d\n", DEFAULT_RESP_INTERVAL);
+	fprintf(stderr, "    -r interval    : Set query response interval in 1/10th of second. Default: %d\n", DEFAULT_RESP_INTERVAL);
 }
 
 int main(int argc, char **argv) {

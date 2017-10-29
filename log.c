@@ -39,12 +39,12 @@ static struct {
 		.log_file = NULL
 };
 
-int init_log(int loglevel, char *fp) {
-	if(fp == NULL) {
+int init_log(int loglevel, char *log_filename) {
+	if(log_filename == NULL) {
 		log_cfg.log_file = stderr;
 	}
 	else {
-		log_cfg.log_file = fopen(fp, "a");
+		log_cfg.log_file = fopen(log_filename, "a");
 		if(log_cfg.log_file == NULL) {
 			printf("Can't open log file! %s\n", strerror(errno));
 			return -1;
@@ -61,18 +61,17 @@ void close_log(void) {
 	return;
 }
 
-void write_log(int loglevel, const char *fmt, ...) {
+size_t write_log(int loglevel, const char *fmt, ...) {
 	va_list args;
 	char buffer[LOG_BUFFER_SIZE];
-	time_t cur_time = time(NULL);
-	struct tm *p = localtime(&cur_time);
-	struct timeval tv;
 	size_t len;
 	FILE *fp;
+	struct timeval tv;
 
 	/* If loglevel of message > configured loglevel then exit */
 	if(loglevel > log_cfg.level)
-		return;
+		return 0;
+
 	/* Check log destination */
 	if(log_cfg.log_destination == LOG_DEST_STDERR || log_cfg.log_destination == LOG_DEST_FILE) {
 		if(log_cfg.log_file == NULL) {
@@ -83,22 +82,21 @@ void write_log(int loglevel, const char *fmt, ...) {
 		}
 
 		/* Get current time and date */
-		cur_time = time(NULL);
-		p = localtime(&cur_time);
 		gettimeofday(&tv, NULL);
 
 		/* Write date and time with delimiter */
-		len = strftime(buffer, sizeof(buffer), "%b %d %Y %T.", p);
+		len = strftime(buffer, sizeof(buffer), "%b %d %Y %T.", localtime(&tv.tv_sec));
 		len += sprintf(buffer+len, "%06d: ", (int)(tv.tv_usec));
 		va_start(args, fmt);
 		len += vsnprintf(buffer+len, sizeof(buffer)-len-1, fmt, args);
 		va_end(args);
 
 		/* Append \n and \0 at the end of message */
-		buffer[len] = '\n';
-		buffer[len+1] = '\0';
-		fprintf(fp, buffer);
+		buffer[len++] = '\n';
+		buffer[len] = '\0';
+
+		fwrite(buffer, 1, len, fp);
 		fflush(fp);
 	}
-	return;
+	return len;
 }
