@@ -39,7 +39,7 @@ For building igmptools, we need to create a separate build directory in project 
 
 After creating build directory `cd` into it and run `cmake`:
 
-    cd
+    cd build
     cmake ..
 
 Once `cmake` generated makefile, we can build igmptool by running `make` inside our build directory:
